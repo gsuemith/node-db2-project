@@ -37,10 +37,31 @@ const checkCarPayload = (req, res, next) => {
 
 const checkVinNumberValid = (req, res, next) => {
   // DO YOUR MAGIC
+  const vinValidator = require('vin-validator')
+  const vin = req.body.vin;
+  if (vinValidator.validate(vin)){
+    next()
+  } else {
+    res.status(400).json({
+      message: `vin ${vin} is invalid`
+    })
+  }
 }
 
-const checkVinNumberUnique = (req, res, next) => {
+const checkVinNumberUnique = Cars => (req, res, next) => {
   // DO YOUR MAGIC
+  const vin = req.body.vin;
+  Cars.db('cars').where({ vin }).first()
+  .then(car => {
+    if (car) {
+      res.status(400).json({
+        message: `vin ${vin} already exists`
+      });
+    } else {
+      next();
+    }
+  })
+  .catch(err => next(err))
 }
 
 module.exports = {
