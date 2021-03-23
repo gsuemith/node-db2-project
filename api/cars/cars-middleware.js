@@ -20,6 +20,19 @@ const checkCarId = Cars => (req, res, next) => {
 
 const checkCarPayload = (req, res, next) => {
   // DO YOUR MAGIC
+  let missingField = '';
+  ['vin', 'make', 'model', 'mileage'].forEach(field => {
+    if (!req.body[field]) {
+      missingField = field
+    }
+  })
+  if (missingField) {
+    res.status(400).json({
+      message: `${missingField} is missing`
+    })
+  } else {
+    next()
+  }
 }
 
 const checkVinNumberValid = (req, res, next) => {
